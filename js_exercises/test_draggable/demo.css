@@ -32,6 +32,8 @@
     display: grid;
     font-size: x-large;
     color: #404040;
+
+    cursor: grab;
 }
 
 body {
