@@ -25,10 +25,13 @@ function onDrag({movementX, movementY}){ // from event grab only movementX, and 
 draggableElem.addEventListener("mousedown", () => {
     draggableElem.addEventListener("mousemove", onDrag);
     draggableElem.style.cursor = "grabbing";
+    audio.playbackRate = -1;
     audio.play();
 });
 
 document.addEventListener("mouseup", () => {
     draggableElem.removeEventListener("mousemove", onDrag);
     draggableElem.style.cursor = "grab";
+    audio.playbackRate = 1;
+    audio.play();    
 });

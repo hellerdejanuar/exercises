@@ -4,6 +4,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let particleArray = [];
 let audio = new Audio('resources/sounds/knock.mp3');
+let gravity = 1.5;
+let friction = 0.1;
 
 
 // handle mouse
@@ -14,8 +16,9 @@ const mouse = {
 }
 
 window.addEventListener('click', function(e){
-    //audio.play();
+    create_by_click();
 });
+
 window.addEventListener('mousemove', function(event){
     mouse.x = event.x;
     mouse.y = event.y;
@@ -32,11 +35,17 @@ class Particle {
     constructor(x, y){
         this.x = x;
         this.y = y;
-        this.size = Math.random() * 2 + 3;
+        this.speed_x = 0;
+        this.speed_y = 1;
+        this.bounce_state = false; // false for falling, true for rebound
+
+        this.size = 10;
+
         this.baseX = this.x; // remember original position
         this.baseY = this.y; // to return after displacement
         this.density = (Math.random() * 30) + 1;
     }
+
     draw(){
         ctx.fillStyle = 'white';
         ctx.beginPath();
@@ -44,27 +53,46 @@ class Particle {
         ctx.closePath();
         ctx.fill();
     }
+
+    bounce() {
+        audio.play();
+        this.speed_y = this.speed_y / (gravity + friction) * -1;
+        this.bounce_state = !this.bounce_state;
+    }
+
+    start_falling() {
+        this.speed_y = 1;
+        this.bounce_state = !this.bounce_state;
+    }
+
     update(){
-        let dx = mouse.x - this.x;
-        let dy = mouse.y - this.y;
-        let distance = Math.hypot(dx, dy);
-        if (distance < 200) {
-            this.size = 10;
-        } else {
-            this.size = 3;
+        this.y = this.y + this.speed_y;     // update pos
+        this.speed_y = this.speed_y * (this.bounce_state ? 1 / gravity : gravity); // update speed
+
+        // case for bouncing
+        if (this.y + this.speed_y >= canvas.height) { 
+            this.bounce();
+        // case for when it reaches the top    
+        } else if ( this.bounce_state && this.speed_y >= -1) { 
+            this.start_falling();
         }
     }
 }
 
-function init() {
+/*function init() {
     particleArray = [];
-    for (let i = 0; i < 500; i++) {              // create particles
+    for (let i = 0; i < 500; i++) {              // create 10 particles
         let x = Math.random() * canvas.width;   // randomly spread
         let y = Math.random() * canvas.height;  // across the canvas
         particleArray.push(new Particle(x, y));
     }
 }
-init();
+init();*/
+
+function create_by_click() {
+    particleArray.push(new Particle(mouse.x, mouse.y));
+    audio.play();
+}
 //console.log(particleArray);
 
 function animate() {
@@ -72,7 +100,6 @@ function animate() {
     for (let i = 0; i < particleArray.length; i++){
         particleArray[i].draw();
         particleArray[i].update();
-
     }
     requestAnimationFrame(animate);
 }
