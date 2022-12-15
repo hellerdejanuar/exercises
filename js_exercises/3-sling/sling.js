@@ -4,14 +4,16 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let particleArray = [];
-// audio
-let audio = new Audio('resources/sounds/knock.mp3');
 // physics 
 let force = 1
 let gravity = 1.5;
 let surface_friction = 0.1;
-let air_friction = 0.1;
-
+let air_friction = 0.001;
+// audio
+const sound = {
+    knock: new Audio('../resources/sounds/knock.mp3'),
+    throw: new Audio('../resources/sounds/throw.mp3')
+}
 
 // handle mouse
 const mouse = {
@@ -75,7 +77,7 @@ class Particle {
     }
 
     bounce() {
-        audio.play();
+        sound.knock.play();
         this.speed_y = this.speed_y / (gravity + surface_friction) * -1;
         this.bounce_state = !this.bounce_state;
     }
@@ -112,7 +114,7 @@ function create_by_click() {
                                     mouse.y, 
                                     mouse.mousedown_x,
                                     mouse.mousedown_y));
-    audio.play();
+    sound.throw.play();
 }
 
 function animate() {
