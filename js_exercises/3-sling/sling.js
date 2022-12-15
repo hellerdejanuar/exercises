@@ -1,9 +1,13 @@
+// image rendering
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let particleArray = [];
+// audio
 let audio = new Audio('resources/sounds/knock.mp3');
+// physics 
+let force = 1
 let gravity = 1.5;
 let surface_friction = 0.1;
 let air_friction = 0.1;
@@ -13,10 +17,14 @@ let air_friction = 0.1;
 const mouse = {
     x: null,
     y: null,
+    mousedown_x: null,
+    mousedown_y: null,
     radius: 150
 }
 
 window.addEventListener('click', function(e){
+    e.preventDefault(true);
+
     create_by_click();
 });
 
@@ -26,18 +34,29 @@ window.addEventListener('mousemove', function(event){
     //console.log(mouse.x, mouse.y);
 });
 
+window.addEventListener('mousedown', function(event){ 
+    mouse.mousedown_x = event.x;
+    mouse.mousedown_y = event.y;
+});
+
+window
+
 /*ctx.fillStyle = 'white';
 ctx.font = '30px Verdana';
 ctx.fillText('A', 0, 30);
 ctx.strokeStyle = 'white';
 const data = ctx.getImageData(0, 0, 100, 100);*/
 
+function sling() {
+
+}
+
 class Particle {
-    constructor(x, y){
+    constructor(x, y, mousedown_x, mousedown_y){
         this.x = x;
         this.y = y;
-        this.speed_x = 1;
-        this.speed_y = 1;
+        this.speed_x = (x - mousedown_x) * force;
+        this.speed_y = 1; // bugs when positive or zero displacement
         this.bounce_state = false; // false for falling, true for rebound
 
         this.size = 10;
@@ -88,21 +107,13 @@ class Particle {
     }
 }
 
-/*function init() {
-    particleArray = [];
-    for (let i = 0; i < 500; i++) {              // create 10 particles
-        let x = Math.random() * canvas.width;   // randomly spread
-        let y = Math.random() * canvas.height;  // across the canvas
-        particleArray.push(new Particle(x, y));
-    }
-}
-init();*/
-
 function create_by_click() {
-    particleArray.push(new Particle(mouse.x, mouse.y));
+    particleArray.push(new Particle(mouse.x, 
+                                    mouse.y, 
+                                    mouse.mousedown_x,
+                                    mouse.mousedown_y));
     audio.play();
 }
-//console.log(particleArray);
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
