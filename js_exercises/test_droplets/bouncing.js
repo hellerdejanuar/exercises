@@ -5,7 +5,8 @@ canvas.height = window.innerHeight;
 let particleArray = [];
 let audio = new Audio('resources/sounds/knock.mp3');
 let gravity = 1.5;
-let friction = 0.1;
+let surface_friction = 0.1;
+let air_friction = 0.1;
 
 
 // handle mouse
@@ -35,7 +36,7 @@ class Particle {
     constructor(x, y){
         this.x = x;
         this.y = y;
-        this.speed_x = 0;
+        this.speed_x = 1;
         this.speed_y = 1;
         this.bounce_state = false; // false for falling, true for rebound
 
@@ -51,12 +52,12 @@ class Particle {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.closePath();
-        ctx.fill();
+        ctx.fill(); 
     }
 
     bounce() {
         audio.play();
-        this.speed_y = this.speed_y / (gravity + friction) * -1;
+        this.speed_y = this.speed_y / (gravity + surface_friction) * -1;
         this.bounce_state = !this.bounce_state;
     }
 
@@ -65,9 +66,17 @@ class Particle {
         this.bounce_state = !this.bounce_state;
     }
 
-    update(){
-        this.y = this.y + this.speed_y;     // update pos
-        this.speed_y = this.speed_y * (this.bounce_state ? 1 / gravity : gravity); // update speed
+    move() {
+        this.y = this.y + this.speed_y ;     // update pos
+        this.x = this.x + this.speed_x - (this.speed_x * air_friction);
+
+        this.speed_y = this.speed_y * (this.bounce_state ? 1 / gravity : gravity) // accelerate
+                     - (air_friction * this.speed_y);           
+        this.speed_x = this.speed_x - (air_friction * this.speed_x);
+    }
+
+    update() {
+        this.move();
 
         // case for bouncing
         if (this.y + this.speed_y >= canvas.height) { 
