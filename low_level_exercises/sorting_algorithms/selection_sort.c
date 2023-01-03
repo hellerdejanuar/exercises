@@ -18,8 +18,8 @@ void swap_elements(int *array, size_t x, size_t y) {
  **/
 void selection_sort(int *array, size_t size) {
 	size_t i, j;
-	for (i = 0; i < size; i ++) {
-		for (j = i; j < size; j++) {
+	for (i = 0; i < size; i ++) { 		// traverse list
+		for (j = i; j < size; j++) { 		// find next
 			if (array[i] <= array[j])
 				continue;
 			swap_elements(array, i, j);
